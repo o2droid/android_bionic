@@ -70,12 +70,13 @@ __filesizebits( struct statfs*  s )
     };
     int  nn = 0;
 
-    for (; known64[nn] != EOL_MAGIC; ++nn) {
-        if (known64[nn] == s->f_type) {
+    for (;;) {
+        if ( known64[nn] == EOL_MAGIC )
+            return 32;
+
+        if ( known64[nn] == s->f_type )
             return 64;
-        }
     }
-    return 32;
 }
 
 
@@ -98,10 +99,12 @@ __link_max( struct statfs*  s )
     };
     int   nn = 0;
 
-    for (; knownMax[nn].type != EOL_MAGIC; ++nn) {
-        if (knownMax[nn].type == s->f_type) {
+    for (;;) {
+        if ( knownMax[nn].type == EOL_MAGIC )
+            return LINK_MAX;
+
+        if ( knownMax[nn].type == s->f_type )
             return knownMax[nn].max;
-        }
     }
     return LINK_MAX;
 }
@@ -118,12 +121,12 @@ __2_symlinks( struct statfs*  s )
     };
     int  nn = 0;
 
-    for (; knownNoSymlinks[nn] != EOL_MAGIC; ++nn) {
-        if (knownNoSymlinks[nn] == s->f_type) {
+    for (;;) {
+        if (knownNoSymlinks[nn] == 0)
+            return 1;
+        if (knownNoSymlinks[nn] == s->f_type)
             return 0;
-        }
     }
-    return 1;
 }
 
 static long

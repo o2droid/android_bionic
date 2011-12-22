@@ -438,16 +438,9 @@ static unsigned elfhash(const char *_name)
     while(*name) {
         h = (h << 4) + *name++;
         g = h & 0xf0000000;
-        /* The hash algorithm in the ELF ABI is as follows:
-         *   if (g != 0)
-         *       h ^=g >> 24;
-         *   h &= ~g;
-         * But we can use the equivalent and faster implementation:
-         */
+        h ^= g;
         h ^= g >> 24;
     }
-    /* Lift the operation out of the inner loop */
-    h &= 0x0fffffff;
     return h;
 }
 
@@ -724,11 +717,7 @@ verify_elf_object(void *base, const char *name)
     if (hdr->e_ident[EI_MAG3] != ELFMAG3) return -1;
 
     /* TODO: Should we verify anything else in the header? */
-#ifdef ANDROID_ARM_LINKER
-    if (hdr->e_machine != EM_ARM) return -1;
-#elif defined(ANDROID_X86_LINKER)
-    if (hdr->e_machine != EM_386) return -1;
-#endif
+
     return 0;
 }
 
